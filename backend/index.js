@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
-console.log("JWT_SECRET loaded:", process.env.JWT_SECRET);
+if (!process.env.JWT_SECRET) {
+  console.warn("Warning: JWT_SECRET is not set; authentication tokens cannot be signed.");
+}
 
 
 //Import dependencies

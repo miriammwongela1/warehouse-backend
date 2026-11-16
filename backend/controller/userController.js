@@ -28,6 +28,11 @@ export const register = async (req, res) => {
     if (!fullname || !email || !phonenumber || !username || !password || !role) {
       return res.status(400).json({ message: "All fields are required." });
     }
+    if (!["Staff", "Cashier"].includes(role)) {
+      return res.status(400).json({
+        message: "Only Staff and Cashier roles can register publicly.",
+      });
+    }
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
