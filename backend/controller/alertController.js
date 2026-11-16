@@ -51,7 +51,7 @@ export const getManagerAlerts = async (req, res) => {
       `Expired items: ${expiredCount}`
     ];
 
-    const totalProducts = products.reduce(
+    const totalStock = products.reduce(
       (total, product) => {
         return total + Number(product.stock|| 0);
       },
@@ -61,7 +61,8 @@ export const getManagerAlerts = async (req, res) => {
     res.json({
       settings,
       summary: {
-         totalProducts,
+         totalProducts: products.length,
+         totalStock,
          lowStockCount, 
          expiringCount, 
          expiredCount 

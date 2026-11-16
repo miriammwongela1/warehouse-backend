@@ -1,6 +1,7 @@
 import Sale from "../model/saleModel.js";
 import Product from "../model/productModel.js";
 import DiscountSettings from "../model/discountSettingsModel.js";
+import { getDiscountedPrice } from "../utils/discountPricing.js";
 import { v4 as uuidv4 } from "uuid";
 
 export const checkout = async (req, res) => {
@@ -55,17 +56,11 @@ export const checkout = async (req, res) => {
         return res.status(400).json({ message: `Unknown product: ${ProductID}.` });
       }
 
-      const daysLeft = Math.ceil(
-        (new Date(product.priceExpiryDate) - now) / (1000 * 60 * 60 * 24)
-      );
-      const discountedPrice =
-        settings.expiryDiscountThreshold > 0 &&
-        daysLeft <= settings.expiryDiscountThreshold &&
-        daysLeft >= 0
-          ? product.price - (product.price * settings.discountRate) / 100
-          : product.price;
+      const discountedPrice = getDiscountedPrice(product, settings, now);
       const unitPrice =
-        discountedPrice < product.price ? discountedPrice : product.price;
+        discountedPrice != null && discountedPrice < product.price
+          ? discountedPrice
+          : product.price;
       const lineTotal = unitPrice * item.quantity;
 
       subtotal += product.price * item.quantity;

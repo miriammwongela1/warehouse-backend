@@ -1,5 +1,6 @@
 import User from "../model/userModel.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 /**
  * @desc    Login user with username + password
@@ -22,13 +23,23 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid employee ID or password." });
     }
 
-    // 3. Return role so frontend can redirect
+    const token = jwt.sign(
+      { userId: user._id, username: user.username, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
     res.json({
-      message: "Login successful",
-      role: user.role,
-      fullname: user.fullname,
-      username: user.username,
-      employeeId: user.employeeId
+      message: "Login successful.",
+      token,
+      user: {
+        _id: user._id,
+        employeeId: user.employeeId,
+        fullname: user.fullname,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
